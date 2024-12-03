@@ -1,9 +1,10 @@
+import re
 import sys
 
 DEBUG = sys.gettrace() is not None
 input_file = "inputs/test.txt" if DEBUG else "./inputs/day03.txt"
 with open(input_file) as f:
-    s = f.read()
+    content = f.read()
 
 
 class Mul:
@@ -48,15 +49,54 @@ def parse_mul(s: str, i: int):
     return i, mul
 
 
-I = 0
-multiplies = []
-while I < len(s):
-    I, mul = parse_mul(s, I)
-    if mul is not None:
-        multiplies.append(mul)
+def get_multiplies(s: str):
+    I = 0
+    multiplies = []
+    while I < len(s):
+        I, mul = parse_mul(s, I)
+        if mul is not None:
+            multiplies.append(mul)
 
-part_one = sum(m.result() for m in multiplies)
+    return multiplies
+
+
+def get_multiplies_2(s: str):
+    i = s.find("don't()")
+    if i >= 0:
+        s = s[:i]
+
+    I = 0
+    multiplies = []
+    while I < len(s):
+        I, mul = parse_mul(s, I)
+        if mul is not None:
+            multiplies.append(mul)
+
+    return multiplies
+
+
+part_one = sum(m.result() for m in get_multiplies(content))
 print(f"Part one = {part_one}")
 
-part_two = None
+s = "do()" + content + "do()"
+part_two = 0
+while len(s) > 0:
+    do_index = s.find("do()")
+    if do_index < 0:
+        break
+
+    s = s[do_index + 4:]
+    if len(s) < 1:
+        break
+
+    i_next = s.find("do()")
+
+    if i_next >= 0:
+        mults = get_multiplies_2(s[:i_next])
+        for mult in mults:
+            part_two += mult.result()
+        s = s[i_next:]
+    else:
+        s = ""
+
 print(f"Part two = {part_two}")
