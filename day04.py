@@ -41,5 +41,17 @@ for i, row in enumerate(arr):
 
 print(f"Part one = {part_one}")
 
-part_two = None
+
+def build_mas(c1, c2):
+    return (c1 == "M" and c2 == "S") or (c1 == "S" and c2 == "M")
+
+
+def check_cross(i: int, j: int):
+    if arr[i][j] != "A" or (i - 1) < 0 or (j - 1) < 0 or i + 1 >= m or j + 1 >= n:
+        return False
+
+    return build_mas(arr[i - 1][j - 1], arr[i + 1][j + 1]) and build_mas(arr[i - 1][j + 1], arr[i + 1][j - 1])
+
+
+part_two = sum(sum(check_cross(i, j) for j in range(n)) for i in range(m))
 print(f"Part two = {part_two}")
