@@ -76,9 +76,8 @@ def creates_loop(block_i, block_j):
 
 
 part_two = 0
-for bi, row in tqdm(enumerate(grid), total=len(grid)):
-    for bj, val in enumerate(row):
-        if grid[bi][bj] != '#' and (bi, bj) != (GI, GJ) and creates_loop(bi, bj):
-            part_two += 1
+for (bi, bj) in tqdm(visited):
+    if grid[bi][bj] != '#' and (bi, bj) != (GI, GJ) and creates_loop(bi, bj):
+        part_two += 1
 
 print(f"Part two = {part_two}")
