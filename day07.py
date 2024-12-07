@@ -37,10 +37,7 @@ def backtrack2(target: int, arr: list, value: int, i: int = 0):
     if i >= len(arr):
         return target == value
 
-    if value >= target:
-        return False
-
-    return any(backtrack2(target, arr, operation(value, arr[i]), i + 1) for operation in (add, mult, concat))
+    return any(backtrack2(target, arr, operation(value, arr[i]), i + 1) for operation in (mult, add, concat))
 
 
 class Equation:
@@ -48,7 +45,7 @@ class Equation:
         left_str, right_str = line.split(':')
         self.left = get_ints(left_str)[0]
         self.right = get_ints(right_str)
-        self.can_form_simple = False
+        self.can_form_simple = None
 
     def can_form(self) -> bool:
         if len(self.right) < 2:
