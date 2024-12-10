@@ -41,5 +41,25 @@ def get_score(i: int, j: int) -> int:
 part_one = sum(get_score(i, j) for i, j in itertools.product(range(m), range(n)))
 print(f"Part one = {part_one}")
 
-part_two = None
+
+def dfs(i, j, visited: set):
+    if grid[i][j] == 9:
+        return 1
+
+    score = 0
+    for di, dj in directions:
+        ai, aj = i + di, j + dj
+        if valid(ai, aj) and (ai, aj) not in visited and grid[ai][aj] == grid[i][j] + 1:
+            visited.add((ai, aj))
+            score += dfs(ai, aj, visited)
+            visited.remove((ai, aj))
+
+    return score
+
+
+def get_score2(i: int, j: int) -> int:
+    return dfs(i, j, {(i, j)}) if grid[i][j] == 0 else 0
+
+
+part_two = sum(get_score2(i, j) for i, j in itertools.product(range(m), range(n)))
 print(f"Part two = {part_two}")
