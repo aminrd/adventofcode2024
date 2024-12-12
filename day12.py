@@ -7,22 +7,22 @@ with open(input_file) as f:
 grid = [line.strip() for line in grid]
 m, n = len(grid), len(grid[0])
 
-LEFT = (-1, 0)
+LEFT = (0, -1)
 RIGHT = (0, 1)
-TOP = (0, -1)
+TOP = (-1, 0)
 DOWN = (1, 0)
 directions = (LEFT, DOWN, RIGHT, TOP)
 
 
 def get_block_line(i: int, j: int, di: int, dj: int) -> tuple:
     if (di, dj) == (0, -1):  # left
-        return ((i, j), (i + 1, j))
+        return (i, j), (i + 1, j)
     elif (di, dj) == (-1, 0):  # top
-        return ((i, j), (i, j + 1))
+        return (i, j), (i, j + 1)
     elif (di, dj) == (0, 1):  # right
-        return ((i, j + 1), (i + 1, j + 1))
+        return (i, j + 1), (i + 1, j + 1)
     else:
-        return ((i + 1, j), (i + 1, j + 1))
+        return (i + 1, j), (i + 1, j + 1)
 
 
 def is_horizontal(point1, point2):
@@ -35,13 +35,13 @@ def is_vertical(point1, point2):
 
 def get_line_directions(p1, p2):
     if is_horizontal(p1, p2):
-        return ((0, 1), (0, -1))
+        return (0, 1), (0, -1)
     else:
-        return ((1, 0), (-1, 0))
+        return (1, 0), (-1, 0)
 
 
 def move_point(p: tuple, d: tuple):
-    return (p[0] + d[0], p[1] + d[1])
+    return p[0] + d[0], p[1] + d[1]
 
 
 def move_line(p1: tuple, p2: tuple, d):
@@ -53,7 +53,7 @@ def move_line(p1: tuple, p2: tuple, d):
 def get_cell_by_edge(e: tuple, d: tuple):
     base_i, base_j = e[0]
     if d == DOWN:
-        i, j = base_i, base_i
+        i, j = base_i, base_j
     elif d == TOP:
         i, j = base_i - 1, base_j
     elif d == LEFT:
@@ -64,14 +64,12 @@ def get_cell_by_edge(e: tuple, d: tuple):
     if valid(i, j):
         return grid[i][j]
 
-    return None
-
 
 def are_neighbour_edges_same_side(e1: tuple, e2: tuple):
     if is_horizontal(*e1):
-        return get_cell_by_edge(e1, TOP) == get_cell_by_edge(e2, TOP)
+        return get_cell_by_edge(e1, TOP) == get_cell_by_edge(e2, TOP) or get_cell_by_edge(e1, DOWN) == get_cell_by_edge(e2, DOWN)
     else:
-        return get_cell_by_edge(e1, LEFT) == get_cell_by_edge(e2, LEFT)
+        return get_cell_by_edge(e1, LEFT) == get_cell_by_edge(e2, LEFT) or get_cell_by_edge(e1, RIGHT) == get_cell_by_edge(e2, RIGHT)
 
 
 class Region:
@@ -127,9 +125,11 @@ class Region:
 
             # Move the line left<->right or up<->down
             for line_direction in line_directions:
+                previous_edge = (p1, p2)
                 edge = move_line(p1, p2, line_direction)
-                while edge in edges and are_neighbour_edges_same_side((p1, p2), edge):
+                while edge in edges and are_neighbour_edges_same_side(previous_edge, edge):
                     edges.remove(edge)
+                    previous_edge = edge
                     edge = move_line(edge[0], edge[1], line_direction)
 
         return cnt
