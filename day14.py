@@ -36,10 +36,10 @@ class Robot:
 
     def get_quarter_id(self):
         px, py = self.p
-        if px == (M-1) // 2 or py == (N-1)//2:
+        if px == (M - 1) // 2 or py == (N - 1) // 2:
             return None
 
-        return px < (M-1) // 2, py < (N-1) // 2
+        return px < (M - 1) // 2, py < (N - 1) // 2
 
     def __str__(self):
         return f"Robot(p={self.p}, v={self.v})"
@@ -68,5 +68,59 @@ for value in cnt.values():
     part_one *= value
 print(f"Part one = {part_one}")
 
-part_two = None
+iter_count = 0
+max_iter = 10000
+robots = [robot.copy() for robot in original_robots]
+
+
+def valid(i: int, j: int) -> bool:
+    return 0 <= i < M and 0 <= j < N
+
+
+def edge(grid, i, j):
+    return valid(i, j) and grid[i][j] == '*'
+
+
+def has_frame(grid, list_of_robots: list) -> bool:
+    for robot in list_of_robots:
+        i, j = robot.p
+        if not edge(grid, i, j + 1) or not edge(grid, i + 1, j):
+            continue
+
+        I = i + 1
+        while edge(grid, I, j):
+            I += 1
+
+        J = j + 1
+        while edge(grid, i, J):
+            J += 1
+
+        if (I-i) < 10 or (J-j) < 10:
+            continue
+
+        if all(grid[x][J - 1] == '*' for x in range(i, I)) and all(grid[I - 1][y] == '*' for y in range(j, J)):
+            return True
+
+    return False
+
+
+def print_grid(grid):
+    print('=' * 105)
+    for row in grid:
+        print("".join(row))
+
+
+while iter_count < max_iter:
+    iter_count += 1
+    grid = [[' '] * N for _ in range(M)]
+    for robot in robots:
+        robot.move()
+        rx, ry = robot.p
+        grid[rx][ry] = '*'
+
+    if has_frame(grid, robots):
+        print_grid(grid)
+        break
+
+part_two = iter_count
 print(f"Part two = {part_two}")
