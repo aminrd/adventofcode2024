@@ -63,15 +63,35 @@ def run():
     global idx_pointer
     while idx_pointer < len(program) - 1:
         opcode, operand = program[idx_pointer], program[idx_pointer + 1]
-        if DEBUG:
-            print(f"Running {functions[opcode].__name__}({operand})")
         functions[opcode](operand)
         idx_pointer += 2
         pass
+
 
 run()
 part_one = ",".join(str(value) for value in output)
 print(f"Part one = {part_one}")
 
-part_two = None
+
+def copy_itself(A: int) -> bool:
+    global idx_pointer
+    global output
+
+    registery[0] = A
+    registery[1] = 0
+    registery[2] = 0
+    idx_pointer = 0
+
+    while idx_pointer < len(program) - 1 and len(output) < len(program):
+        opcode, operand = program[idx_pointer], program[idx_pointer + 1]
+        functions[opcode](operand)
+        idx_pointer += 2
+        pass
+
+    does_copy_itself = output == program
+    output = []
+    return does_copy_itself
+
+
+part_two = copy_itself(117440)
 print(f"Part two = {part_two}")
